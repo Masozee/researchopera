@@ -15,8 +15,7 @@ Thumbs.db
 /backend/bin/
 /backend/obj/
 /backend/backend
-/backend/go.sum
-/backend/go.mod
+
 
 # Docker
 *.env

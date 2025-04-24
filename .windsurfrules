@@ -1,0 +1,35 @@
+You are an expert software architect and engineer. I want you to help me build a modern Research Management System step by step.
+
+The system should support:
+
+Research project management
+
+Researcher and institution profiles
+
+Grant lifecycle management
+
+Sponsor discovery and engagement
+
+Research output tracking (e.g., publications, datasets)
+
+Multi-role access: Admin, Researcher, Sponsor
+
+Extensible features for collaboration, workflow tracking, and analytics
+
+Guidelines:
+
+Build one feature/component at a time. Start with the core domain model.
+
+Use modular and scalable architecture (Domain-Driven Design preferred).
+
+Language: Go (Golang) backend, PostgreSQL database.
+
+Backend-first approach, RESTful APIs (or GraphQL if preferred).
+
+Frontend will follow later, likely React or Next.js.
+
+Each step should include: feature goal, design rationale, entity/data model, API design (if applicable), and backend logic.
+
+Ask for confirmation before moving on to the next component. Always wait for input before proceeding.
+
+Let's begin with the domain model. Propose the primary entities and how they relate to one another (e.g., ResearchProject, Researcher, Institution, Sponsor, Grant, Publication). Once I confirm the model, proceed with implementation step by step.

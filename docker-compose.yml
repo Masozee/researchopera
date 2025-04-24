@@ -2,30 +2,124 @@ version: '3.8'
 services:
   backend:
     build: ./backend
+    image: researchopera/backend:${VERSION:-latest}
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - DB_HOST=db
       - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=example
+      - DB_PASSWORD_FILE=/run/secrets/db_password
+      - DB_NAME=researchopera
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    secrets:
+      - db_password
+    networks:
+      - backend-net
+      - db-net
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   frontend:
     build: ./frontend
+    image: researchopera/frontend:${VERSION:-latest}
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - frontend-net
+      - backend-net
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   db:
-    image: mysql:latest
-    restart: always
+    image: mysql:8.3
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: example
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
+      MYSQL_DATABASE: researchopera
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$(cat /run/secrets/db_password)"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - db_data:/var/lib/mysql
+    secrets:
+      - db_password
+    networks:
+      - db-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   db_data:
+    driver: local
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+networks:
+  frontend-net:
+    driver: bridge
+  backend-net:
+    driver: bridge
+  db-net:
+    driver: bridge

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/app:cached
+    environment:
+      - GO_ENV=development
+      - DEBUG=true
+    command: ["air", "-c", ".air.toml"]
+    ports:
+      - "8080:8080"
+      - "2345:2345" # Delve debugger port
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+      - SYS_PTRACE
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules # Empty volume to prevent overriding node_modules
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  db:
+    image: mysql:8.3
+    environment:
+      MYSQL_ROOT_PASSWORD: devpassword
+      MYSQL_DATABASE: researchopera
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data_dev:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+volumes:
+  db_data_dev:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
