@@ -1,5 +1,13 @@
 # Research Opera
 
+**Swipe right on your next big research opportunity.**
+
+A smart, intuitive platform that matches researchers with grants, collaborators, and sponsors. Designed to simplify research management while making discovery fun and efficient.
+
+---
+
+**GitHub Repository:** [https://github.com/Masozee/researchopera.git](https://github.com/Masozee/researchopera.git)
+
 **Version:** 0.0.0-averroes
 
 Research Opera is a platform for managing research projects and collaborations across institutions. It provides a modern full-stack architecture with a Go backend, Next.js frontend (with Tailwind CSS, shadcn/ui, and Radix UI), and a MySQL database, all orchestrated with Docker Compose.
